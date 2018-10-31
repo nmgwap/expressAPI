@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>个人中心</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="css/user.css">
+</head>
+
+<body>
+    <el-container id="user" class="contain">
+        <el-header class="header">
+            <div class="logo">
+                笔记 V1.0
+            </div>
+            <el-menu class="head-pa" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+                <el-submenu index="2">
+                    <template slot="title">nmgwap</template>
+                    <el-menu-item index="2-1">修改资料</el-menu-item>
+                    <el-menu-item index="2-2">退出</el-menu-item>
+                </el-submenu>
+            </el-menu>
+        </el-header>
+        <el-container>
+            <el-aside class="aside">
+                <!-- 头像 -->
+                <div class="aside-head">
+                    <img src="img/head.jpg" alt="">
+                </div>
+                <!-- 说明 -->
+                <div class="aside-msg">
+                    一个程序员的独白
+                </div>
+            </el-aside>
+            <el-container>
+                <el-main>
+                    <el-breadcrumb separator-class="el-icon-arrow-right">
+                        <el-breadcrumb-item>首页</el-breadcrumb-item>
+                        <el-breadcrumb-item>笔记列表</el-breadcrumb-item>
+                    </el-breadcrumb>
+                    <el-row class="main-box">
+                        <el-col :span="8">
+                            <div class="grid-content bg-purple">
+                                <div class="main-d">
+                                    <el-button type="primary">笔记列表</el-button>
+                                </div>
+                                <div>
+                                    <div v-for="data in listData" @click='showdata(data)' class="listcon">{{data.title}}</div>
+                                </div>
+                            </div>
+                        </el-col>
+                        <el-col :span="16">
+                            <div class="grid-content bg-purple-light">
+                                <div class="main-d">
+                                    <el-button type="primary">添加笔记</el-button>
+                                </div>
+                                <el-form ref="form" :model="form" label-width="80px">
+                                    <el-form-item label="名称">
+                                        <el-input v-model="form.title"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="内容">
+                                        <el-input type="textarea" rows="10" v-model="form.content"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submydata">立即创建</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </el-main>
+                <el-footer class="footer">
+                    <div class="in-foot">
+                        CopyRight ldhblog 2017-2018
+                    </div>
+                </el-footer>
+            </el-container>
+        </el-container>
+    </el-container>
+    <!-- 引入jquery -->
+    <script type="text/javascript " src="js/jquery-1.9.0.min.js "></script>
+    <script type="text/javascript" src="js/vue.min.js"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+        new Vue({
+            el: '#user',
+            data: {
+                activeIndex: '1',
+                form: {
+                    user: 'nmgwap',
+                    name: '',
+                    content: '',
+                    addtime: '2018-07-22',
+                    edittime: '2018-07-22'
+                },
+                username: 'nmgwap',
+                listData: []
+            },
+            created() {
+                this.getdata()
+            },
+            methods: {
+                getdata() {
+                    var self = this
+                    var parm = {
+                        user: self.username,
+                    }
+                    $.post("/userData/list ", parm, function(result) {
+                        if (result.success) {
+                            self.listData = result.data
+                        } else {
+                            self.$message.error(result.msg);
+                        }
+                    });
+                },
+                showdata(data) {
+                    this.form = data
+                },
+                submydata() {
+                    var self = this
+                    var parm = self.form
+                    $.post("/userData/add ", parm, function(result) {
+                        if (result.success) {
+                            self.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
+                            self.getdata()
+                        } else {
+                            self.$message.error(result.msg);
+                        }
+                    });
+                }
+            }
+
+        });
+    </script>
+</body>
+
+</html>
